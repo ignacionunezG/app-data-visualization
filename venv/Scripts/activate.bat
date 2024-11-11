@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\ignac\OneDrive\Documentos\2ºMIT\Visualización\Proyecto Final\app-data-visualization\app-deploy\venv"
+set "VIRTUAL_ENV=C:\Users\ignac\OneDrive\Documentos\2ºMIT\Visualización\Proyecto Final\app-data-visualization\venv"
 
 if not defined PROMPT (
     set "PROMPT=$P$G"
