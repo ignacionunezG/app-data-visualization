@@ -1,6 +1,6 @@
 from dash import Dash
-from src.layout import create_layout
-from src.callbacks import register_callbacks
+from layout import create_layout
+from callbacks import register_callbacks
 
 # Inicialización de la app
 app = Dash(__name__)

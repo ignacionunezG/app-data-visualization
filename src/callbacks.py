@@ -3,7 +3,7 @@ import plotly.express as px
 from dash import Input, Output
 
 # Cargar datos preprocesados
-df = pd.read_excel("data/pitstop_data.xlsx")
+df = pd.read_excel("data/Historical Pitstops Grouped.xlsx")
 
 def register_callbacks(app):
     @app.callback(
