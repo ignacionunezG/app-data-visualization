@@ -9,6 +9,10 @@ teams = df["escuderia"].unique()  # Obtener las escuderías únicas
 df_positions = pd.read_excel("data/PosicionesGanadasPorPiloto.xlsx")
 years = sorted(df_positions["año"].unique())  # Años únicos
 
+# Cargar datos de clústeres y circuitos
+clusters_df = pd.read_excel("CircuitClusters.xlsx")
+clusters = clusters_df["Cluster"].unique()
+
 def create_layout(app):
     return html.Div(
         style={
@@ -77,6 +81,54 @@ def create_layout(app):
             # Contenedor de la gráfica de posiciones ganadas
             html.Div(
                 dcc.Graph(id="positions-gained-graph"),
+                style={
+                    "width": "100%",
+                    "backgroundColor": "rgb(250, 250, 250)",
+                    "padding": "20px",
+                    "borderRadius": "10px",
+                    "boxShadow": "0px 4px 6px rgba(0, 0, 0, 0.1)"
+                }
+            ),
+html.H1(
+                "Análisis de Circuitos de F1",
+                style={
+                    "textAlign": "center",
+                    "color": "rgb(30, 30, 30)",
+                    "marginBottom": "20px",
+                    "fontSize": "2.5em",
+                },
+            ),
+            # Dropdown para seleccionar un clúster
+            html.Div(
+                children=[
+                    html.Label("Selecciona un clúster:"),
+                    dcc.Dropdown(
+                        id="cluster-dropdown",
+                        options=[{"label": f"Clúster {cluster}", "value": cluster} for cluster in clusters],
+                        value=clusters[0],  # Seleccionar el primer clúster por defecto
+                        clearable=False,
+                        style={"width": "50%", "marginBottom": "20px"}
+                    ),
+                ],
+                style={"textAlign": "center"}
+            ),
+            # Dropdown para seleccionar un circuito
+            html.Div(
+                children=[
+                    html.Label("Selecciona un circuito:"),
+                    dcc.Dropdown(
+                        id="circuit-dropdown",
+                        options=[],  # Se actualizará dinámicamente
+                        value=None,
+                        clearable=False,
+                        style={"width": "50%", "marginBottom": "20px"}
+                    ),
+                ],
+                style={"textAlign": "center"}
+            ),
+            # Gráfico de estadísticas del circuito
+            html.Div(
+                dcc.Graph(id="circuit-stats-graph"),
                 style={
                     "width": "100%",
                     "backgroundColor": "rgb(250, 250, 250)",

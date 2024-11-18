@@ -129,43 +129,105 @@ def register_callbacks(app):
         # Cargar datos de posiciones ganadas desde el archivo Excel
         df_positions = pd.read_excel("data/PosicionesGanadasPorPiloto.xlsx")
         
-        # Filtrar únicamente los datos del año seleccionado
+        # Filtrar los datos por el año seleccionado
         df_filtered = df_positions[df_positions["año"] == selected_year]
+        
+        # Verificar que los datos sean correctos
+        print(f"Datos filtrados para el año {selected_year}:")
+        print(df_filtered)
         
         # Ordenar el DataFrame por número de posiciones ganadas (de mayor a menor)
         df_filtered = df_filtered.sort_values(by="posiciones_ganadas", ascending=False)
-        
-        # Crear el gráfico de barras usando solo los datos filtrados
+
+        # Verificar nombres de pilotos que se usarán
+        print("Valores de 'nombre_piloto':", df_filtered["nombre_piloto"].tolist())
+
+        # Crear el gráfico de barras usando datos filtrados
         fig = px.bar(
             df_filtered,
-            x="nombre_piloto",  # Usar los nombres de los pilotos en el eje X
-            y="posiciones_ganadas",  # Usar las posiciones ganadas en el eje Y
+            x="nombre_piloto",
+            y="posiciones_ganadas",
             title=f"Posiciones ganadas por piloto en {selected_year}",
             labels={"nombre_piloto": "Piloto", "posiciones_ganadas": "Posiciones Ganadas"},
-            color="posiciones_ganadas",  # Colorear barras según el número de posiciones ganadas
-            color_continuous_scale=px.colors.sequential.Viridis  # Escala de colores
+            color="posiciones_ganadas",
+            color_continuous_scale=px.colors.sequential.Viridis
         )
 
         # Personalizar el diseño del gráfico
         fig.update_layout(
-            plot_bgcolor="rgb(248, 248, 248)",  # Fondo claro
+            plot_bgcolor="rgb(248, 248, 248)",
+
             xaxis=dict(
                 title="Piloto",
-                categoryorder="total descending"  # Ordenar de mayor a menor
+                categoryorder="array",  # Ordenar con base en los datos actuales
+                categoryarray=df_filtered["nombre_piloto"].tolist(),  # Nombres de pilotos actuales
             ),
             yaxis=dict(
-                title="Posiciones Ganadas",
+                title="Posiciones Ganadas"
             ),
             font=dict(
-                size=12,  # Tamaño del texto
-                color="rgb(50, 50, 50)"  # Color del texto
+                size=12,
+                color="rgb(50, 50, 50)"
             ),
             title=dict(
                 font=dict(
-                    size=18,  # Tamaño del título
-                    color="rgb(50, 50, 50)"  # Color del título
+                    size=18,
+                    color="rgb(50, 50, 50)"
                 )
             )
+        )
+
+        return fig
+    
+###tercera gráfica:
+
+# Cargar datos preprocesados
+clusters_df = pd.read_excel("data/CircuitClusters.xlsx")
+status_df = pd.read_excel("data/StatusPerCircuit.xlsx")
+
+def register_callbacks(app):
+    # Callback para actualizar la lista de circuitos en función del clúster seleccionado
+    @app.callback(
+        Output("circuit-dropdown", "options"),
+        Input("cluster-dropdown", "value")
+    )
+    def update_circuit_dropdown(selected_cluster):
+        # Filtrar circuitos por clúster seleccionado
+        filtered_circuits = clusters_df[clusters_df["Cluster"] == selected_cluster]["Circuit"]
+        return [{"label": circuit, "value": circuit} for circuit in filtered_circuits]
+
+    # Callback para actualizar el gráfico de estadísticas del circuito seleccionado
+    @app.callback(
+        Output("circuit-stats-graph", "figure"),
+        Input("circuit-dropdown", "value")
+    )
+    def update_circuit_stats(selected_circuit):
+        if not selected_circuit:
+            return px.bar(title="Selecciona un circuito para ver las estadísticas")
+
+        # Filtrar los datos del circuito seleccionado
+        circuit_data = status_df[status_df["Circuit"] == selected_circuit]
+
+        # Agrupar por año y sumar las estadísticas
+        grouped_data = circuit_data.groupby("Season").sum().reset_index()
+
+        # Crear gráfico de barras
+        fig = px.bar(
+            grouped_data,
+            x="Season",
+            y=grouped_data.columns[2:],  # Todas las columnas de Status
+            title=f"Estadísticas del Circuito: {selected_circuit}",
+            labels={"value": "Frecuencia", "variable": "Estado"},
+            barmode="stack"
+        )
+
+        # Personalizar el diseño del gráfico
+        fig.update_layout(
+            plot_bgcolor="rgb(248, 248, 248)",
+            xaxis=dict(title="Temporada"),
+            yaxis=dict(title="Frecuencia"),
+            font=dict(size=12, color="rgb(50, 50, 50)"),
+            title=dict(font=dict(size=18, color="rgb(50, 50, 50)"))
         )
 
         return fig
