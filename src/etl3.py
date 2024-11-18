@@ -74,11 +74,11 @@ def realizar_clustering():
     
     # Realizar clustering
     #optamos por 4 clusters
-    kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
+    kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
     grouped["Cluster"] = kmeans.fit_predict(data_normalized)
     
     # Guardar resultados
     grouped.to_excel("data/CircuitClusters.xlsx")
-    return grouped
 
+# Llamar a la función
 realizar_clustering()

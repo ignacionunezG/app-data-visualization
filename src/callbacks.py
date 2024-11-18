@@ -7,7 +7,8 @@ from plotly.colors import qualitative
 
 # Cargar datos preprocesados
 df = pd.read_excel("data/Historical Pitstops Grouped.xlsx")
-
+clusters_df = pd.read_excel("data/CircuitClusters.xlsx")
+status_df = pd.read_excel("data/StatusPerCircuit.xlsx")
 # Colores personalizados para las escuderías
 color_map = {
     "Ferrari": "red",
@@ -180,20 +181,16 @@ def register_callbacks(app):
         return fig
     
 ###tercera gráfica:
-
-# Cargar datos preprocesados
-clusters_df = pd.read_excel("data/CircuitClusters.xlsx")
-status_df = pd.read_excel("data/StatusPerCircuit.xlsx")
-
-def register_callbacks(app):
-    # Callback para actualizar la lista de circuitos en función del clúster seleccionado
+# Callback para actualizar la lista de circuitos según la clasificación seleccionada
     @app.callback(
         Output("circuit-dropdown", "options"),
         Input("cluster-dropdown", "value")
     )
-    def update_circuit_dropdown(selected_cluster):
-        # Filtrar circuitos por clúster seleccionado
-        filtered_circuits = clusters_df[clusters_df["Cluster"] == selected_cluster]["Circuit"]
+    def update_circuit_dropdown(selected_clasif):
+        if selected_clasif is None:
+            return []
+        # Filtrar circuitos por clasificación seleccionada
+        filtered_circuits = clusters_df[clusters_df["Clasificacion Circuito"] == selected_clasif]["Circuit"]
         return [{"label": circuit, "value": circuit} for circuit in filtered_circuits]
 
     # Callback para actualizar el gráfico de estadísticas del circuito seleccionado
@@ -201,33 +198,38 @@ def register_callbacks(app):
         Output("circuit-stats-graph", "figure"),
         Input("circuit-dropdown", "value")
     )
-    def update_circuit_stats(selected_circuit):
+    def update_circuit_treemap(selected_circuit):
         if not selected_circuit:
-            return px.bar(title="Selecciona un circuito para ver las estadísticas")
+            # Si no hay circuito seleccionado, devolver un gráfico vacío
+            return px.treemap(
+                path=["Circuit"], 
+                values=[],
+                title="Selecciona un circuito para ver las estadísticas"
+            )
 
-        # Filtrar los datos del circuito seleccionado
+        # Filtrar los datos para el circuito seleccionado
         circuit_data = status_df[status_df["Circuit"] == selected_circuit]
 
-        # Agrupar por año y sumar las estadísticas
-        grouped_data = circuit_data.groupby("Season").sum().reset_index()
+        # Sumar las características de 'Status' para ese circuito a lo largo de los años
+        aggregated_data = circuit_data.drop(columns=["Season", "Circuit"]).sum().reset_index()
+        aggregated_data.columns = ["Status", "Value"]
 
-        # Crear gráfico de barras
-        fig = px.bar(
-            grouped_data,
-            x="Season",
-            y=grouped_data.columns[2:],  # Todas las columnas de Status
-            title=f"Estadísticas del Circuito: {selected_circuit}",
-            labels={"value": "Frecuencia", "variable": "Estado"},
-            barmode="stack"
+        # Crear el gráfico tipo Treemap
+        fig = px.treemap(
+            aggregated_data,
+            path=["Status"],  # Jerarquía
+            values="Value",   # Tamaño de las cajas según el valor
+            title=f"Mapa de árbol de características del circuito: {selected_circuit}",
         )
 
-        # Personalizar el diseño del gráfico
+
+        # Personalizar diseño del gráfico
         fig.update_layout(
-            plot_bgcolor="rgb(248, 248, 248)",
-            xaxis=dict(title="Temporada"),
-            yaxis=dict(title="Frecuencia"),
-            font=dict(size=12, color="rgb(50, 50, 50)"),
-            title=dict(font=dict(size=18, color="rgb(50, 50, 50)"))
+            margin=dict(t=50, l=25, r=25, b=25),
+            title=dict(
+                font=dict(size=18, color="rgb(50, 50, 50)"),
+                x=0.5  # Centrar título
+            )
         )
 
         return fig
