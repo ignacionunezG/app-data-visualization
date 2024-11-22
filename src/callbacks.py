@@ -32,10 +32,9 @@ def generate_unique_colors(teams, base_colors):
         if team not in color_map:
             color_map[team] = next(available_colors, "gray")  # Asigna un color o gris si se agotan
 
-# Llamar al generador de colores para todas las escuderías del DataFrame
 generate_unique_colors(
     df["escuderia"].unique(), 
-    qualitative.Plotly  # Paleta de colores cualitativos de Plotly
+    qualitative.Plotly  
 )
 def register_callbacks(app):
     # Callback para la gráfica de pit stops
@@ -63,10 +62,8 @@ def register_callbacks(app):
             color_discrete_map=color_map  # Usar colores únicos
         )
 
-        # Escuderías con un único dato (solo un punto)
+        # Escuderías con un único dato
         single_year_teams = filtered_df.groupby("escuderia").filter(lambda x: len(x) == 1)
-
-        # Añadir puntos grandes para escuderías con un único año
         for team in single_year_teams["escuderia"].unique():
             team_data = single_year_teams[single_year_teams["escuderia"] == team]
             fig.add_trace(go.Scatter(
@@ -75,10 +72,10 @@ def register_callbacks(app):
                 mode="markers",
                 marker=dict(
                     size=12,
-                    color=color_map[team],  # Usar el color único asignado
+                    color=color_map[team],  
                     symbol="circle"
                 ),
-                name=team  # Asegurar que la leyenda muestre solo el punto
+                name=team  
             ))
 
         # Configuración del layout del gráfico
@@ -90,20 +87,20 @@ def register_callbacks(app):
                 tick0=2011,
                 dtick=1,
                 showgrid=True,  # Mostrar líneas verticales
-                gridcolor="rgb(200, 200, 200)",  # Líneas grises claras
-                gridwidth=0.5,  # Ancho más fino
+                gridcolor="rgb(200, 200, 200)",  
+                gridwidth=0.5,  
                 zeroline=False  # No mostrar línea base adicional
             ),
             yaxis=dict(
                 title="Duración Promedio (s)",
-                showgrid=True,  # Mostrar líneas horizontales
-                gridcolor="rgb(200, 200, 200)",  # Líneas grises claras
+                showgrid=True,  
+                gridcolor="rgb(200, 200, 200)",  
                 gridwidth=0.5,  # Ancho más fino
                 zeroline=False  # No mostrar línea base adicional
             ),
             legend=dict(
                 title="Escuderías",
-                bgcolor="rgba(255, 255, 255, 0.8)",  # Fondo semitransparente para la leyenda
+                bgcolor="rgba(255, 255, 255, 0.8)",  
                 bordercolor="rgb(200, 200, 200)",
                 borderwidth=1
             ),
@@ -122,6 +119,8 @@ def register_callbacks(app):
 
         return fig  # <-- ¡Este return es crucial!
         
+
+############segunda gráfica: pilotos posiciones ganadas
     @app.callback(
         Output("positions-gained-graph", "figure"),
         Input("year-dropdown", "value")
@@ -160,8 +159,8 @@ def register_callbacks(app):
 
             xaxis=dict(
                 title="Piloto",
-                categoryorder="array",  # Ordenar con base en los datos actuales
-                categoryarray=df_filtered["nombre_piloto"].tolist(),  # Nombres de pilotos actuales
+                categoryorder="array",  
+                categoryarray=df_filtered["nombre_piloto"].tolist(),  
             ),
             yaxis=dict(
                 title="Posiciones Ganadas"
@@ -189,7 +188,6 @@ def register_callbacks(app):
     def update_circuit_dropdown(selected_clasif):
         if selected_clasif is None:
             return []
-        # Filtrar circuitos por clasificación seleccionada
         filtered_circuits = clusters_df[clusters_df["Clasificacion Circuito"] == selected_clasif]["Circuit"]
         return [{"label": circuit, "value": circuit} for circuit in filtered_circuits]
 
@@ -217,7 +215,7 @@ def register_callbacks(app):
         # Crear el gráfico tipo Treemap
         fig = px.treemap(
             aggregated_data,
-            path=["Status"],  # Jerarquía
+            path=["Status"],  
             values="Value",   # Tamaño de las cajas según el valor
             title=f"Mapa de árbol de características del circuito: {selected_circuit}",
         )
@@ -228,7 +226,7 @@ def register_callbacks(app):
             margin=dict(t=50, l=25, r=25, b=25),
             title=dict(
                 font=dict(size=18, color="rgb(50, 50, 50)"),
-                x=0.5  # Centrar título
+                x=0.5 
             )
         )
 

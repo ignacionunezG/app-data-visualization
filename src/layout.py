@@ -5,7 +5,7 @@ import pandas as pd
 df = pd.read_excel("data/Historical Pitstops Grouped.xlsx")
 teams = df["escuderia"].unique()  # Obtener las escuderías únicas
 
-# Cargar los datos para obtener la lista inicial de años
+# Cargar los datos para obtener la lista inicial de pilotos por año
 df_positions = pd.read_excel("data/PosicionesGanadasPorPiloto.xlsx")
 years = sorted(df_positions["año"].unique())  # Años únicos
 

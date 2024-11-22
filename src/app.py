@@ -6,10 +6,8 @@ from callbacks import register_callbacks
 app = Dash(__name__)
 app.title = "F1 Data Visualization"
 
-# Configuración del layout
 app.layout = create_layout(app)
 
-# Registro de los callbacks
 register_callbacks(app)
 
 if __name__ == "__main__":
