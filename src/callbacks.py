@@ -6,9 +6,9 @@ import plotly.graph_objects as go
 from plotly.colors import qualitative
 
 # Cargar datos preprocesados
-df = pd.read_excel("data/Historical Pitstops Grouped.xlsx")
-clusters_df = pd.read_excel("data/CircuitClusters.xlsx")
-status_df = pd.read_excel("data/StatusPerCircuit.xlsx")
+df = pd.read_excel("src/data/Historical Pitstops Grouped.xlsx")
+clusters_df = pd.read_excel("src/data/CircuitClusters.xlsx")
+status_df = pd.read_excel("src/data/StatusPerCircuit.xlsx")
 # Colores personalizados para las escuderías
 color_map = {
     "Ferrari": "red",
@@ -127,7 +127,7 @@ def register_callbacks(app):
     )
     def update_positions_graph(selected_year):
         # Cargar datos de posiciones ganadas desde el archivo Excel
-        df_positions = pd.read_excel("data/PosicionesGanadasPorPiloto.xlsx")
+        df_positions = pd.read_excel("src/data/PosicionesGanadasPorPiloto.xlsx")
         
         # Filtrar los datos por el año seleccionado
         df_filtered = df_positions[df_positions["año"] == selected_year]

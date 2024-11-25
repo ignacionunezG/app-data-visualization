@@ -2,15 +2,15 @@ from dash import html, dcc
 import pandas as pd
 
 # Cargar los datos para obtener la lista de escuderías
-df = pd.read_excel("data/Historical Pitstops Grouped.xlsx")
+df = pd.read_excel("src/data/Historical Pitstops Grouped.xlsx")
 teams = df["escuderia"].unique()  # Obtener las escuderías únicas
 
 # Cargar los datos para obtener la lista inicial de pilotos por año
-df_positions = pd.read_excel("data/PosicionesGanadasPorPiloto.xlsx")
+df_positions = pd.read_excel("src/data/PosicionesGanadasPorPiloto.xlsx")
 years = sorted(df_positions["año"].unique())  # Años únicos
 
 # Cargar datos de clústeres y circuitos
-clusters_df = pd.read_excel("data/CircuitClusters.xlsx")
+clusters_df = pd.read_excel("src/data/CircuitClusters.xlsx")
 clusters = clusters_df["Clasificacion Circuito"].unique()
 
 def create_layout(app):
